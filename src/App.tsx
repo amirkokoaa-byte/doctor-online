@@ -66,7 +66,6 @@ const MedicineScanner = () => {
     if (!file) return;
     setLoading(true);
     try {
-      const ai = getAiClient();
       const imagePart = await fileToGenerativePart(file);
       
       const prompt = `
@@ -817,7 +816,6 @@ const PrescriptionScanner = () => {
     if (!file) return;
     setLoading(true);
     try {
-      const ai = getAiClient();
       const imagePart = await fileToGenerativePart(file);
       
       const prompt = `
@@ -969,7 +967,6 @@ const RadiologyInterpreter = () => {
     if (!file) return;
     setLoading(true);
     try {
-      const ai = getAiClient();
       const imagePart = await fileToGenerativePart(file);
       
       const prompt = `
@@ -1108,7 +1105,6 @@ const LabAnalyzer = () => {
     if (!file) return;
     setLoading(true);
     try {
-      const ai = getAiClient();
       const imagePart = await fileToGenerativePart(file);
       
       const prompt = `
