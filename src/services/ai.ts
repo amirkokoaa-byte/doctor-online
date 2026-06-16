@@ -6,10 +6,10 @@ let aiClient: GoogleGenAI | null = null;
 
 export const getAiClient = () => {
   if (!aiClient) {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY;
     if (!apiKey) {
-      console.error("GEMINI_API_KEY is missing");
-      throw new Error("GEMINI_API_KEY is required");
+      console.error("GEMINI_API_KEY or VITE_GEMINI_API_KEY is missing");
+      throw new Error("مفتاح API غير موجود. لحل المشكلة جذرياً: تأكد من إضافة GEMINI_API_KEY أو VITE_GEMINI_API_KEY في إعدادات البيئة (Environment Variables) في حسابك على Vercel وإعادة البناء (Redeploy).");
     }
     aiClient = new GoogleGenAI({ apiKey });
   }

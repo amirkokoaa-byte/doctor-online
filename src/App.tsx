@@ -93,9 +93,9 @@ const MedicineScanner = () => {
       });
 
       setResult(response.text || "لم يتم العثور على نتائج.");
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setResult("حدث خطأ أثناء تحليل الدواء.");
+      setResult("حدث خطأ أثناء تحليل الدواء: " + (error.message || "يرجى المحاولة مرة أخرى."));
     } finally {
       setLoading(false);
     }
@@ -677,19 +677,15 @@ const Dashboard = () => {
 
   async function getMedicalAdvice(symptom: string) {
     try {
-      const response = await fetch('/api/medical-analysis', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: `المريض يعاني من ${symptom}. حلل العَرَض واقترح فحوصات أو أدوية بسيطة بناءً على البروتوكولات الطبية.` })
+      const ai = getAiClient();
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: `المريض يعاني من ${symptom}. حلل العَرَض واقترح فحوصات أو أدوية بسيطة بناءً على البروتوكولات الطبية.`
       });
-      
-      if (!response.ok) throw new Error("فشل الاتصال بقاعدة البيانات");
-      
-      const data = await response.json();
-      return data.analysis; 
-    } catch (error) {
+      return response.text || "لم يتم العثور على نتائج.";
+    } catch (error: any) {
       console.error("Error:", error);
-      return "نعتذر، واجهنا مشكلة في الربط الطبي. يرجى المحاولة لاحقاً.";
+      return "حدث خطأ: " + (error.message || "نعتذر، واجهنا مشكلة في الربط الطبي. يرجى المحاولة لاحقاً.");
     }
   }
 
@@ -869,9 +865,9 @@ const PrescriptionScanner = () => {
       }
 
       setResult(text);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setResult("حدث خطأ أثناء تحليل الروشتة. يرجى المحاولة مرة أخرى.");
+      setResult("حدث خطأ أثناء تحليل الروشتة: " + (error.message || "يرجى المحاولة مرة أخرى."));
     } finally {
       setLoading(false);
     }
@@ -998,9 +994,9 @@ const RadiologyInterpreter = () => {
       }
 
       setResult(text);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setResult("حدث خطأ أثناء تحليل الأشعة.");
+      setResult("حدث خطأ أثناء تحليل الأشعة: " + (error.message || "يرجى المحاولة مرة أخرى."));
     } finally {
       setLoading(false);
     }
@@ -1132,9 +1128,9 @@ const LabAnalyzer = () => {
       }
 
       setResult(text);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setResult("حدث خطأ أثناء تحليل التقرير.");
+      setResult("حدث خطأ أثناء تحليل التقرير: " + (error.message || "يرجى المحاولة مرة أخرى."));
     } finally {
       setLoading(false);
     }
