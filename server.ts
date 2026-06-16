@@ -6,11 +6,47 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json());
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
   // API routes FIRST
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
+  });
+
+  app.post("/api/analyze-image", async (req, res) => {
+    try {
+      const { prompt, imageBase64, mimeType } = req.body;
+      
+      if (!prompt || !imageBase64 || !mimeType) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const ai = new GoogleGenAI({ 
+        apiKey: process.env.GEMINI_API_KEY,
+        httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
+      });
+      
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: {
+          parts: [
+            {
+              inlineData: {
+                data: imageBase64,
+                mimeType: mimeType
+              }
+            },
+            { text: prompt }
+          ]
+        }
+      });
+
+      res.json({ text: response.text });
+    } catch (error: any) {
+      console.error("Error analyzing image:", error);
+      res.status(500).json({ error: error.message || "Failed to analyze image" });
+    }
   });
 
   app.post("/api/medical-analysis", async (req, res) => {

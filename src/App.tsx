@@ -85,14 +85,20 @@ const MedicineScanner = () => {
         - نسق الإجابة في نقاط منظمة جداً باستخدام Markdown.
       `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: {
-          parts: [imagePart, { text: prompt }]
-        }
+      const response = await fetch('/api/analyze-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: prompt,
+          imageBase64: imagePart.inlineData.data,
+          mimeType: imagePart.inlineData.mimeType
+        })
       });
+      
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "فشل الاتصال بالخادم");
 
-      setResult(response.text || "لم يتم العثور على نتائج.");
+      setResult(data.text || "لم يتم العثور على نتائج.");
     } catch (error: any) {
       console.error(error);
       setResult("حدث خطأ أثناء تحليل الدواء: " + (error.message || "يرجى المحاولة مرة أخرى."));
@@ -677,12 +683,14 @@ const Dashboard = () => {
 
   async function getMedicalAdvice(symptom: string) {
     try {
-      const ai = getAiClient();
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: `المريض يعاني من ${symptom}. حلل العَرَض واقترح فحوصات أو أدوية بسيطة بناءً على البروتوكولات الطبية.`
+      const response = await fetch('/api/medical-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: `المريض يعاني من ${symptom}. حلل العَرَض واقترح فحوصات أو أدوية بسيطة بناءً على البروتوكولات الطبية.` })
       });
-      return response.text || "لم يتم العثور على نتائج.";
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to generate medical advice");
+      return data.analysis || "لم يتم العثور على نتائج.";
     } catch (error: any) {
       console.error("Error:", error);
       return "حدث خطأ: " + (error.message || "نعتذر، واجهنا مشكلة في الربط الطبي. يرجى المحاولة لاحقاً.");
@@ -833,14 +841,20 @@ const PrescriptionScanner = () => {
         إذا وجدت تداخلات دوائية خطيرة، ابدأ الرد بكلمة "CRITICAL_FLAG".
       `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: {
-          parts: [imagePart, { text: prompt }]
-        }
+      const response = await fetch('/api/analyze-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: prompt,
+          imageBase64: imagePart.inlineData.data,
+          mimeType: imagePart.inlineData.mimeType
+        })
       });
+      
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "فشل الاتصال بالخادم");
 
-      let text = response.text || "لم يتم العثور على نتائج.";
+      let text = data.text || "لم يتم العثور على نتائج.";
       
       if (text.includes("CRITICAL_INTERACTION_FOUND")) {
         setInteractionModalOpen(true);
@@ -974,14 +988,20 @@ const RadiologyInterpreter = () => {
         إذا كانت تستدعي المتابعة، ابدأ بـ "WARNING_FLAG".
       `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: {
-          parts: [imagePart, { text: prompt }]
-        }
+      const response = await fetch('/api/analyze-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: prompt,
+          imageBase64: imagePart.inlineData.data,
+          mimeType: imagePart.inlineData.mimeType
+        })
       });
+      
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "فشل الاتصال بالخادم");
 
-      let text = response.text || "لم يتم العثور على نتائج.";
+      let text = data.text || "لم يتم العثور على نتائج.";
       
       if (text.includes("CRITICAL_FLAG")) {
         setSeverity('CRITICAL');
@@ -1108,14 +1128,20 @@ const LabAnalyzer = () => {
         إذا كانت تستدعي انتباه الطبيب قريباً، ابدأ بـ "WARNING_FLAG".
       `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: {
-          parts: [imagePart, { text: prompt }]
-        }
+      const response = await fetch('/api/analyze-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: prompt,
+          imageBase64: imagePart.inlineData.data,
+          mimeType: imagePart.inlineData.mimeType
+        })
       });
+      
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "فشل الاتصال بالخادم");
 
-      let text = response.text || "لم يتم العثور على نتائج.";
+      let text = data.text || "لم يتم العثور على نتائج.";
       
       if (text.includes("CRITICAL_FLAG")) {
         setSeverity('CRITICAL');
